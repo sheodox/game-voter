@@ -1,0 +1,12 @@
+extends layout
+block content
+    h1 Vote!
+    label(for="newGame") Add a game:
+    input#newGame
+    br
+    br
+    button#reset Reset votes!
+    p Current leader:
+        span#leader
+    ul#games
+    script(src="javascripts/main.js")

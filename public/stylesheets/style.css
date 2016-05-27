@@ -1,0 +1,19 @@
+body {
+    margin: 0 auto;
+    width: 400px;
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #00B7FF;
+}
+button.remove {
+    float: right;
+}
+#leader {
+    font-weight: bold;
+}
+li {
+    list-style: none;
+}
