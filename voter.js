@@ -31,12 +31,22 @@ module.exports = function(io) {
             broadcast();
         });
 
+        function alterVotes(name, inc) {
+            var target = games.find(function(game) {
+                return game.name === name;
+            });
+            target.votes = Math.max(0, target.votes + inc);
+        }
+
         socket.on('vote', function(name) {
             console.log(`vote for ${name}`);
-            games.find(function(game) {
-                return game.name === name;
-            }).votes++;
+            alterVotes(name, 1);
+            broadcast();
+        });
 
+        socket.on('unvote', function(name) {
+            console.log(`unvote for ${name}`);
+            alterVotes(name, -1);
             broadcast();
         });
 

@@ -21,7 +21,15 @@
             li.appendChild(removeButton);
             voteButton.gameName = game.name;
             voteButton.textContent = game.votes;
-            voteButton.addEventListener('click', emitName('vote'));
+            voteButton.addEventListener('mousedown', function(e) {
+                socket.emit(
+                    e.button === 0 ? 'vote' : 'unvote',
+                    game.name
+                );
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            voteButton.addEventListener('contextmenu', function(e) {e.preventDefault()});
             span.textContent = ' ' + game.name;
 
             removeButton.textContent = 'x';
