@@ -55,17 +55,24 @@
             ul.appendChild(li);
         });
 
-        leader.textContent = maxVotes(games) || '';
+        maxVotes(games);
+        enforceHeight();
     });
 
     function maxVotes(games) {
-        if (games.length) {
-            var max = games.reduce(function(max, nextTry) {
-                return nextTry.voters.length > max.voters.length ? nextTry : max;
-            });
-
-            return `${max.title} - [${max.voters.length}]`;
-        }
+        var leader = gebi('leader');
+        leader.innerHTML = '';
+        games.slice()
+            .sort(function(one, two) {
+                return two.voters.length - one.voters.length;
+            })
+            .slice(0, 10)
+            .reduce(function(done, next) {
+                var li = document.createElement('li');
+                li.textContent = `${next.voters.length} - ${next.title}`;
+                done.appendChild(li);
+                return done;
+            }, leader);
     }
 
     function emitName(type) {
@@ -87,7 +94,7 @@
     });
     
     window.addEventListener('resize', enforceHeight);
-    var right = gebi('right-column');
+    var right = gebi('games');
     function enforceHeight() {
         right.style.height = window.innerHeight + 'px';
     }
