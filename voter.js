@@ -91,7 +91,13 @@ module.exports = function(io) {
 
 function loadGames() {
     try {
-        return JSON.parse(fs.readFileSync(saveFile).toString());
+        var games = JSON.parse(fs.readFileSync(saveFile).toString());
+
+        //reset votes when the server restarts
+        games.forEach(function(game) {
+            game.voters = [];
+        });
+        return games;
     }catch(e) {
         return [];
     }
