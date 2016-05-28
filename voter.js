@@ -6,9 +6,9 @@ module.exports = function(io) {
     var games = loadGames();
     var router = require('express').Router();
 
-    function gameIsKnown(name) {
+    function gameIsKnown(title) {
         return games.some(function(game) {
-            return game.name === name;
+            return game.title === title;
         });
     }
 
@@ -26,54 +26,62 @@ module.exports = function(io) {
         socket.on('reset', function() {
             //reset all votes to 0;
             games.forEach(function(game) {
-                game.votes = 0;
+                game.voters = [];
             });
             broadcast();
         });
 
-        function alterVotes(name, inc) {
-            var target = games.find(function(game) {
-                return game.name === name;
+        function getTarget(data) {
+            return games.find(function(game) {
+                return game.title === data.title;
             });
-            target.votes = Math.max(0, target.votes + inc);
         }
 
-        socket.on('vote', function(name) {
-            console.log(`vote for ${name}`);
-            alterVotes(name, 1);
+        socket.on('vote', function(data) {
+            console.log(`vote for ${data.title}`);
+            var target = getTarget(data);
+
+            if (target.voters.indexOf(data.user) === -1) {
+                target.voters.push(data.user);
+            }
+
             broadcast();
         });
 
-        socket.on('unvote', function(name) {
-            console.log(`unvote for ${name}`);
-            alterVotes(name, -1);
+        socket.on('unvote', function(data) {
+            console.log(`unvote for ${data.title}`);
+            var target = getTarget(data),
+                index = target.voters.indexOf(data.user);
+            if (index !== -1) {
+                target.voters.splice(index, 1);
+            }
             broadcast();
         });
 
-        socket.on('remove', function(name) {
-            name = normalize(name);
+        socket.on('remove', function(title) {
+            title = normalize(title);
             var index = games.findIndex(function(game) {
-                return game.name === name;
+                return game.title === title;
             });
             if (index !== -1) {
-                console.log(`removing ${name}`);
+                console.log(`removing ${title}`);
                 games.splice(index, 1);
                 saveGames(games);
                 broadcast();
             }
         });
 
-        socket.on('new', function(name) {
-            name = normalize(name);
-            if (name && !gameIsKnown(name)) {
+        socket.on('new', function(title) {
+            title = normalize(title);
+            if (title && !gameIsKnown(title)) {
                 games.push({
-                    name: name,
-                    votes: 0
+                    title: title,
+                    voters: []
                 });
 
                 saveGames(games);
                 broadcast();
-                console.log(`new game ${name}`);
+                console.log(`new game ${title}`);
             }
         });
     });

@@ -1,41 +1,56 @@
 (function() {
     'use strict';
-    var socket = io.connect();
+    function gebi(id) {
+        return document.getElementById(id);
+    }
+    
+    var socket = io.connect(),
+        user = getUser();
+
     socket.on('reconnect', function () {
         location.reload()
     });
 
-    var leader = document.getElementById('leader');
+    var leader = gebi('leader');
 
     socket.on('update', function (games) {
-        var ul = document.getElementById('games');
+        var ul = gebi('games');
         ul.innerHTML = '';
         games.forEach(function(game) {
             var li = document.createElement('li'),
                 voteButton = document.createElement('button'),
                 removeButton = document.createElement('button'),
-                span = document.createElement('span');
+                gameTitle = document.createElement('span'),
+                voters = document.createElement('p');
 
             li.appendChild(voteButton);
-            li.appendChild(span);
+            li.appendChild(gameTitle);
             li.appendChild(removeButton);
-            voteButton.gameName = game.name;
-            voteButton.textContent = game.votes;
+            li.appendChild(voters);
+            
+            voteButton.gameName = game.title;
+            voteButton.textContent = game.voters.length;
+            if (game.voters.includes(user)) {
+                voteButton.classList = 'voted'
+            }
+
             voteButton.addEventListener('mousedown', function(e) {
                 socket.emit(
                     e.button === 0 ? 'vote' : 'unvote',
-                    game.name
+                    {title: game.title, user: user}
                 );
                 e.preventDefault();
                 e.stopPropagation();
             });
             voteButton.addEventListener('contextmenu', function(e) {e.preventDefault()});
-            span.textContent = ' ' + game.name;
+            gameTitle.textContent = ' ' + game.title;
+            voters.textContent = game.voters.join(', ') || 'nobody!';
 
             removeButton.textContent = 'x';
             removeButton.classList = 'remove';
-            removeButton.gameName = game.name;
+            removeButton.gameName = game.title;
             removeButton.addEventListener('click', emitName('remove'));
+
 
             ul.appendChild(li);
         });
@@ -46,10 +61,10 @@
     function maxVotes(games) {
         if (games.length) {
             var max = games.reduce(function(max, nextTry) {
-                return nextTry.votes > max.votes ? nextTry : max;
+                return nextTry.voters.length > max.voters.length ? nextTry : max;
             });
 
-            return `${max.name} - [${max.votes}]`;
+            return `${max.title} - [${max.voters.length}]`;
         }
     }
 
@@ -59,7 +74,7 @@
         }
     }
 
-    document.getElementById('newGame').addEventListener('keydown', function(e) {
+    gebi('newGame').addEventListener('keydown', function(e) {
         if (e.keyCode === 13) {
             var newGame = e.target.value;
             socket.emit('new', newGame);
@@ -67,7 +82,14 @@
         }
     });
 
-    document.getElementById('reset').addEventListener('click', function() {
+    gebi('reset').addEventListener('click', function() {
         socket.emit('reset');
-    })
+    });
+
+    function getUser() {
+        var user = localStorage.getItem('user') || String(prompt('Choose a usertitle')).trim();
+        localStorage.setItem('user', user);
+        gebi('user').textContent = user;
+        return user;
+    }
 }());
