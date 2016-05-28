@@ -101,9 +101,17 @@
     enforceHeight();
 
     function getUser() {
-        var user = localStorage.getItem('user') || String(prompt('Choose a username')).trim();
+        var user = localStorage.getItem('user') || promptUser();
         localStorage.setItem('user', user);
         gebi('user').textContent = user;
+        return user;
+    }
+    function promptUser() {
+        var user;
+        do {
+            user = String(prompt('Choose a username')).trim();
+        } while(!user);
+
         return user;
     }
 }());

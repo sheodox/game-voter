@@ -39,13 +39,16 @@ module.exports = function(io) {
 
         socket.on('vote', function(data) {
             console.log(`vote for ${data.title}`);
-            var target = getTarget(data);
+            data.user = normalize(data.user);
+            if (user) {
+                var target = getTarget(data);
 
-            if (target.voters.indexOf(data.user) === -1) {
-                target.voters.push(data.user);
+                if (target.voters.indexOf(data.user) === -1) {
+                    target.voters.push(data.user);
+                }
+
+                broadcast();
             }
-
-            broadcast();
         });
 
         socket.on('unvote', function(data) {
