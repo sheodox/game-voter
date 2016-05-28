@@ -69,7 +69,7 @@
             .slice(0, 10)
             .reduce(function(done, next) {
                 var li = document.createElement('li');
-                li.textContent = `${next.voters.length} - ${next.title}`;
+                li.textContent = `${next.title} - ${next.voters.length}`;
                 done.appendChild(li);
                 return done;
             }, leader);

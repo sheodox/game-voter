@@ -21,15 +21,13 @@ ul {
     margin: 0;
 }
 ul#games {
+    list-style: none;
     display:flex;
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-content: flex-start;
     align-items: flex-start;
-}
-li {
-    list-style: none;
 }
 #games li {
     width: 475px;
