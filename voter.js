@@ -40,7 +40,7 @@ module.exports = function(io) {
         socket.on('vote', function(data) {
             console.log(`vote for ${data.title}`);
             data.user = normalize(data.user);
-            if (user) {
+            if (data.user) {
                 var target = getTarget(data);
 
                 if (target.voters.indexOf(data.user) === -1) {
