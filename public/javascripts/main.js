@@ -31,7 +31,7 @@
             voteButton.gameName = game.title;
             voteButton.textContent = game.voters.length;
             if (game.voters.includes(user)) {
-                voteButton.classList = 'voted'
+                voteButton.className = 'voted'
             }
 
             voteButton.addEventListener('mousedown', function(e) {
