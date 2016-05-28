@@ -19,7 +19,8 @@ module.exports = function(io) {
     io.on('connection', function(socket) {
         socket.emit('update', games);
 
-        function broadcast() {
+        function update() {
+            saveGames(games);
             io.emit('update', games);
         }
 
@@ -28,7 +29,7 @@ module.exports = function(io) {
             games.forEach(function(game) {
                 game.voters = [];
             });
-            broadcast();
+            update();
         });
 
         function getTarget(data) {
@@ -45,9 +46,8 @@ module.exports = function(io) {
 
                 if (target.voters.indexOf(data.user) === -1) {
                     target.voters.push(data.user);
+                    update();
                 }
-
-                broadcast();
             }
         });
 
@@ -55,10 +55,11 @@ module.exports = function(io) {
             console.log(`unvote for ${data.title}`);
             var target = getTarget(data),
                 index = target.voters.indexOf(data.user);
+
             if (index !== -1) {
                 target.voters.splice(index, 1);
+                update();
             }
-            broadcast();
         });
 
         socket.on('remove', function(title) {
@@ -66,11 +67,11 @@ module.exports = function(io) {
             var index = games.findIndex(function(game) {
                 return game.title === title;
             });
+
             if (index !== -1) {
                 console.log(`removing ${title}`);
                 games.splice(index, 1);
-                saveGames(games);
-                broadcast();
+                update();
             }
         });
 
@@ -82,8 +83,7 @@ module.exports = function(io) {
                     voters: []
                 });
 
-                saveGames(games);
-                broadcast();
+                update();
                 console.log(`new game ${title}`);
             }
         });
@@ -94,18 +94,31 @@ module.exports = function(io) {
 
 function loadGames() {
     try {
-        var games = JSON.parse(fs.readFileSync(saveFile).toString());
-
-        //reset votes when the server restarts
-        games.forEach(function(game) {
-            game.voters = [];
-        });
-        return games;
+        return JSON.parse(fs.readFileSync(saveFile).toString());
     }catch(e) {
         return [];
     }
 }
+
+var savePromise = Promise.resolve();
 function saveGames(games) {
-    console.log('saving');
-    fs.writeFileSync(saveFile, JSON.stringify(games));
+    console.log('save queued');
+    var dump = JSON.stringify(games, null, 4);
+
+    //queue up saves so we don't try writing before the last one finishes
+    savePromise.then(function() {
+        return new Promise(function(resolve) {
+            console.log('saving');
+            fs.writeFile(
+                saveFile,
+                dump,
+                function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    resolve();
+                }
+            );
+        })
+    })
 }
