@@ -57,7 +57,7 @@ p {
     float: left;
     width: 400px;
 }
-#right-column {
+.right-column {
     float: right;
     width: calc(100% - 400px);
     padding: 10px;
