@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "forever start app.js",
+    "stop": "forever stop app.js",
     "restart": "forever stop app.js && forever start app.js"
   },
   "dependencies": {
