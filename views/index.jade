@@ -1,14 +1,16 @@
 extends layout
 block content
-    h1 Vote!
-    p Username:
-        span#user
-    br
-    label(for="newGame") Add a game:
-    input#newGame
-    p Click to vote, right click to unvote
-    button#reset Reset votes!
-    p Current leader:
-        span#leader
-    ul#games
+    section#left-column
+        h1 Vote!
+        h2 Current leader:
+            span#leader
+        p Username:
+            span#user
+        br
+        label(for="newGame") Add a game:
+        input#newGame
+        p Click to vote, right click to unvote
+        button#reset Reset votes!
+    section#right-column
+        ul#games
     script(src="javascripts/main.js")

@@ -85,9 +85,16 @@
     gebi('reset').addEventListener('click', function() {
         socket.emit('reset');
     });
+    
+    window.addEventListener('resize', enforceHeight);
+    var right = gebi('right-column');
+    function enforceHeight() {
+        right.style.height = window.innerHeight + 'px';
+    }
+    enforceHeight();
 
     function getUser() {
-        var user = localStorage.getItem('user') || String(prompt('Choose a usertitle')).trim();
+        var user = localStorage.getItem('user') || String(prompt('Choose a username')).trim();
         localStorage.setItem('user', user);
         gebi('user').textContent = user;
         return user;
