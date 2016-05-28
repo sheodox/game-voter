@@ -47,7 +47,7 @@
             voters.textContent = game.voters.join(', ') || 'nobody!';
 
             removeButton.textContent = 'x';
-            removeButton.classList = 'remove';
+            removeButton.className = 'remove';
             removeButton.gameName = game.title;
             removeButton.addEventListener('click', emitName('remove'));
 
